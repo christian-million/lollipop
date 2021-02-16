@@ -193,7 +193,26 @@ class LinkedList:
         bool
             Whether the LinkedList has a cycle or not
         '''
-        pass
+        if self.head:
+
+            # temporary traversal reference
+            current_node = self.head
+
+            # A list of nodes we've already traversed
+            checked_nodes = LinkedList()
+            while current_node:
+
+                # Check each node against all other checked nodes
+                for checked in checked_nodes:
+                    if current_node.nxt is checked:
+                        return True
+                else:
+                    # Add to list of checked nodes
+                    checked_nodes.append(current_node)
+                    current_node = current_node.nxt
+
+            # If we made it out of the loop, then no cycle!
+            return False
 
     def linked_list_type(self):
         '''Classifies the LinkedList into circle, lollipop, or terminating
@@ -206,7 +225,31 @@ class LinkedList:
         str
             One of "circle", "lollipop", or "terminating"
         '''
-        pass
+        if self.head:
+
+            # temporary traversal reference
+            current_node = self.head
+
+            # A list of nodes we've already traversed
+            checked_nodes = LinkedList()
+
+            while current_node:
+
+                # Check each node against all other checked nodes
+                for checked in checked_nodes:
+                    if current_node.nxt is checked:
+                        # Do we reference the head next?
+                        if current_node.nxt is self.head:
+                            return "Circle"
+                        else:
+                            return "Lollipop"
+                else:
+                    # Add to list of checked nodes
+                    checked_nodes.append(current_node)
+                    current_node = current_node.nxt
+
+            # If we made it out of the loop, then we've terminated!
+            return "Terminating"
 
     def reverse(self):
         '''Reverses the order of the LinkedList'''
@@ -338,3 +381,71 @@ class LinkedList:
                 out += f'{self.delimiter}{current_node.data}'
 
             return out
+
+    def to_circle(self):
+        '''Helper function to convert LinkedList into a circle. Sets the last Nodes `nxt` attribute to self.head'''
+        if self.head:
+
+            # This block just retrieves the last node
+            next_node = self.head
+            while next_node:
+                current_node = next_node
+                next_node = next_node.nxt
+
+            # Set the head to the last nodes nxt
+            current_node.nxt = self.head
+
+    def to_lollipop(self, i=None):
+        '''Helper function to convert LinkedList to Lollipop.
+        Parameters
+        ----------
+        i : int
+            the index of the node begins/ends the lollipop (defaults to half of LinkedList len)
+        '''
+        list_length = len(self)
+        if list_length >= 2 and i < list_length:
+
+            # Cast to approximately half if no index is provided
+            if i is None:
+                i = int(list_length/2)
+
+            current_node = self.head
+
+            # Indexing Counter
+            j = 1
+            while current_node:
+
+                # If index of target node, reference it
+                if j == i:
+                    target_node = current_node
+
+                # If we're at the end, then set the last nodes nxt to target node
+                if j == len(self):
+                    current_node.nxt = target_node
+                    break
+
+                # Iterate
+                current_node = current_node.nxt
+                j += 1
+
+        else:
+            raise AttributeError("Lollipops need at least 2 Nodes to work...")
+
+
+if __name__ == '__main__':
+
+    terminating = LinkedList(1, 2, 3, 4, 5, 6)
+
+    circle = LinkedList(1, 2, 3, 4, 5, 6)
+    circle.to_circle()
+
+    lollipop = LinkedList(1, 2, 3, 4, 5, 6)
+    lollipop.to_lollipop()
+
+    print(terminating.has_cycle())
+    print(circle.has_cycle())
+    print(lollipop.has_cycle())
+
+    print(terminating.linked_list_type())
+    print(circle.linked_list_type())
+    print(lollipop.linked_list_type())
